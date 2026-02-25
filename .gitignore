@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+# Outputs / generated
+outputs/
+*.pdf
+*.docx
+
+# Audio / media
+*.mp3
+*.wav
+
+# Temp / cache
+*.bin
+
+# Secrets
+.env
+.venv/

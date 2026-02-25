@@ -1,0 +1,12 @@
+streamlit
+faster-whisper
+transformers==4.36.2
+sentencepiece
+scikit-learn
+nltk
+python-docx
+reportlab
+numpy
+torch
+jiwer
+python-dotenv
