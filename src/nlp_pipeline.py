@@ -6,8 +6,15 @@ from nltk.tokenize import sent_tokenize
 
 
 @st.cache_resource
+@st.cache_resource
 def load_nltk():
-    nltk.download('punkt')
+    nltk_data_path = "/home/appuser/nltk_data"
+
+    os.makedirs(nltk_data_path, exist_ok=True)
+    nltk.data.path.append(nltk_data_path)
+
+    nltk.download('punkt', download_dir=nltk_data_path, quiet=True)
+    nltk.download('punkt_tab', download_dir=nltk_data_path, quiet=True)
 
 load_nltk()
 
