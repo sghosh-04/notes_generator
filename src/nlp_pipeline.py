@@ -1,3 +1,5 @@
+import streamlit as st
+
 from transformers import pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
@@ -5,16 +7,24 @@ import nltk
 from nltk.tokenize import sent_tokenize
 
 # Ensure tokenizer availability
-nltk.download('punkt', quiet=True)
+
+
+@st.cache_resource
+def load_nltk():
+    nltk.download('punkt')
+
+load_nltk()
 
 
 # -----------------------------
 # Summarization
 # -----------------------------
-summarizer = pipeline(
-    "summarization",
-    model="facebook/bart-large-cnn"
-)
+@st.cache_resource
+def get_summarizer():
+    return pipeline(
+        "text2text-generation",
+        model="google/flan-t5-small"
+    )
 
 
 def chunk_text(text, chunk_size=400):
@@ -33,10 +43,8 @@ def chunk_text(text, chunk_size=400):
 
 
 def summarize_text(text, max_len=80, min_len=25):
-    """
-    Generates abstractive summary.
-    Uses chunking for long transcripts.
-    """
+    summarizer = get_summarizer()
+
     chunks = chunk_text(text)
     summaries = []
 
@@ -47,11 +55,9 @@ def summarize_text(text, max_len=80, min_len=25):
             min_length=min_len,
             do_sample=False
         )
-        summaries.append(summary[0]['summary_text'])
+        summaries.append(summary[0]['generated_text'])
 
-    final_summary = " ".join(summaries)
-    return final_summary
-
+    return " ".join(summaries)
 
 # -----------------------------
 # Keyword Extraction
