@@ -175,49 +175,55 @@ QUIZ
 
     with tabs[5]:
         st.markdown("### 📚 Study Flashcards")
-
-        raw_cards = r["flashcards"]
-        card_blocks = re.split(r"\n(?=Card\s\d+:)", raw_cards)
-
+    
+        notes = r["structured_notes"].split("\n")
+    
+        flashcards = []
+        current_topic = None
+        current_points = []
+    
+        for line in notes:
+    
+            if line.startswith("##"):
+                if current_topic:
+                    flashcards.append((current_topic, current_points))
+    
+                current_topic = line.replace("##", "").strip().title()
+                current_points = []
+    
+            elif line.startswith("•"):
+                current_points.append(line.replace("•", "").strip())
+    
+        if current_topic:
+            flashcards.append((current_topic, current_points))
+    
         colors = ["#1E88E5", "#43A047", "#E53935", "#8E24AA", "#FB8C00"]
+    
         cols = st.columns(3)
-
-        for i, block in enumerate(card_blocks):
-
-            if not block.strip():
-                continue
-
-            lines = [l.strip() for l in block.split("\n") if l.strip()]
-
-            title = None
-            points = []
-
-            for line in lines:
-                if line.startswith("Title:"):
-                    title = line.replace("Title:", "").strip()
-
-                elif line.startswith("Point"):
-                    points.append(line.split(":", 1)[1].strip())
-
-            if title:
-                color = colors[i % len(colors)]
-
-                with cols[i % 3]:
-                    st.markdown(
-                        f"""
-                        <div style="
-                            background-color:{color};
-                            padding:18px;
-                            border-radius:16px;
-                            margin-bottom:15px;
-                            color:white;
-                        ">
-                            <h4>📌 {title}</h4>
-                            <p>{"<br>".join(points[:3])}</p>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+    
+        for i, (topic, points) in enumerate(flashcards):
+    
+            color = colors[i % len(colors)]
+    
+            with cols[i % 3]:
+                st.markdown(
+                    f"""
+                    <div style="
+                        padding:18px;
+                        border-radius:16px;
+                        margin-bottom:15px;
+                        background-color:{color};
+                        color:white;
+                        min-height:160px;
+                    ">
+                        <h4>{topic}</h4>
+                        <p style="font-size:14px;">
+                            {"<br>".join(points[:4])}
+                        </p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
     with tabs[6]:
         st.text(r["quiz"])
