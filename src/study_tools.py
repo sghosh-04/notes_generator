@@ -8,7 +8,7 @@ from transformers import pipeline
 @st.cache_resource
 def get_generator():
     return pipeline(
-        "text2text-generation",
+        "any-to-any",                 # ✅ REQUIRED FIX
         model="google/flan-t5-small"
     )
 
