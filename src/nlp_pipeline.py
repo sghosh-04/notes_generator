@@ -22,7 +22,7 @@ load_nltk()
 @st.cache_resource
 def get_generator():
     return pipeline(
-        "text2text-generation",
+        "text-generation",
         model="google/flan-t5-small"   # 🔥 MUCH safer
     )
 
