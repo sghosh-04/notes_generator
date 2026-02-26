@@ -5,7 +5,7 @@
 
 ## 🧠 System Architecture
 
-![System Architecture](assets/architecture.jpg)
+![System Architecture](assests/architecture.jpg)
 
 ---
 
