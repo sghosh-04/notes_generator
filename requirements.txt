@@ -1,6 +1,6 @@
 streamlit
 faster-whisper
-transformers
+transformers==4.36.2
 sentencepiece
 scikit-learn
 nltk
