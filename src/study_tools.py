@@ -8,7 +8,7 @@ from transformers import pipeline
 @st.cache_resource
 def get_generator():
     return pipeline(
-        "any-to-any",                 # ✅ REQUIRED FIX
+        "image-text-to-text",                 # ✅ REQUIRED FIX
         model="google/flan-t5-small"
     )
 
