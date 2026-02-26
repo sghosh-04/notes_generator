@@ -20,12 +20,11 @@ load_nltk()
 # Summarization
 # -----------------------------
 @st.cache_resource
-def get_summarizer():
+def get_generator():
     return pipeline(
         "text2text-generation",
-        model="google/flan-t5-small"
+        model="google/flan-t5-small"   # 🔥 MUCH safer
     )
-
 
 def chunk_text(text, chunk_size=400):
     """
@@ -43,7 +42,7 @@ def chunk_text(text, chunk_size=400):
 
 
 def summarize_text(text, max_len=80, min_len=25):
-    summarizer = get_summarizer()
+    summarizer = get_generator()
 
     chunks = chunk_text(text)
     summaries = []
@@ -51,6 +50,7 @@ def summarize_text(text, max_len=80, min_len=25):
     for chunk in chunks:
         summary = summarizer(
             chunk,
+            f"summarize: {chunk}",
             max_length=max_len,
             min_length=min_len,
             do_sample=False
