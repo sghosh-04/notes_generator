@@ -1,12 +1,9 @@
 import streamlit as st
-
 from transformers import pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import nltk
 from nltk.tokenize import sent_tokenize
-
-# Ensure tokenizer availability
 
 
 @st.cache_resource
@@ -22,11 +19,12 @@ load_nltk()
 @st.cache_resource
 def get_generator():
     return pipeline(
-        "text2text-generation",
-        model="google/flan-t5-small"   # 🔥 MUCH safer
+        "any-to-any",                 # ✅ REQUIRED FIX (Cloud-safe)
+        model="google/flan-t5-small"
     )
 
-def chunk_text(text, chunk_size=400):
+
+def chunk_text(text, chunk_size=250):  # ✅ REQUIRED FIX (safer size)
     """
     Splits text into word-based chunks.
     Prevents transformer token overflow.
@@ -48,7 +46,7 @@ def summarize_text(text, max_len=80):
 
     summarizer = get_generator()
 
-    chunks = chunk_text(text, chunk_size=250)
+    chunks = chunk_text(text)
     summaries = []
 
     for chunk in chunks:
@@ -60,13 +58,16 @@ def summarize_text(text, max_len=80):
         summaries.append(result[0]["generated_text"])
 
     return " ".join(summaries)
+
+
 # -----------------------------
 # Keyword Extraction
 # -----------------------------
 def extract_keywords(text, top_n=10):
-    """
-    Extracts important keywords using TF-IDF.
-    """
+
+    if not text.strip():              # ✅ REQUIRED FIX (prevents crash)
+        return []
+
     vectorizer = TfidfVectorizer(stop_words="english")
     X = vectorizer.fit_transform([text])
 
@@ -82,10 +83,14 @@ def extract_keywords(text, top_n=10):
 # Topic Detection
 # -----------------------------
 def detect_topics(text, top_n=5):
-    """
-    Detects main topics from transcript sentences.
-    """
+
+    if not text.strip():              # ✅ REQUIRED FIX (prevents crash)
+        return [], []
+
     sentences = sent_tokenize(text)
+
+    if len(sentences) < 2:            # ✅ REQUIRED FIX (sklearn safety)
+        return [], sentences
 
     vectorizer = TfidfVectorizer(stop_words="english")
     X = vectorizer.fit_transform(sentences)
