@@ -8,7 +8,7 @@ from transformers import pipeline
 @st.cache_resource
 def get_generator():
     return pipeline(
-        "image-text-to-text",                 # ✅ REQUIRED FIX
+        "text2text-generation",   # ✅ FIXED (correct task)
         model="google/flan-t5-small"
     )
 
@@ -68,7 +68,7 @@ def generate_quiz(text, num_questions=5):
 
         distractors = random.sample(
             sentences,
-            k=min(3, max(1, len(sentences)-1))
+            k=min(3, max(1, len(sentences) - 1))
         )
 
         options = [correct] + distractors
