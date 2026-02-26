@@ -1,59 +1,29 @@
-import re
-import os
 import random
 import nltk
 from nltk.tokenize import sent_tokenize
-os.environ["HF_HOME"] = "D:/hf_cache"
-os.environ["TRANSFORMERS_CACHE"] = "D:/hf_cache"
+import streamlit as st
 from transformers import pipeline
 
-# -----------------------------
-# Load Local Text Generation Model
-# -----------------------------
-generator = pipeline(
-    "text-generation",
-    model="google/flan-t5-small"
-)
 
-# -----------------------------
-# Flashcards
-# -----------------------------
+@st.cache_resource
+def get_generator():
+    return pipeline(
+        "text2text-generation",
+        model="google/flan-t5-small"
+    )
 
-# -----------------------------
-# Flashcards (Structured / Compact)
-# -----------------------------
+
 def generate_flashcards(text, num_cards=5):
-    """
-    Generates compact topic-based flashcards locally.
-    """
+
+    if not text.strip():
+        return "No content available."
+
+    generator = get_generator()
 
     MAX_INPUT_CHARS = 1500
     safe_text = text[:MAX_INPUT_CHARS]
 
-    prompt = f"""
-Create {num_cards} concise study flashcards.
-
-STRICT FORMAT — FOLLOW EXACTLY:
-
-Card 1:
-Title: <short topic name>
-Point 1: <very short concept>
-Point 2: <very short concept>
-Point 3: <very short concept>
-
-Card 2:
-Title: <short topic name>
-Point 1: <very short concept>
-Point 2: <very short concept>
-Point 3: <very short concept>
-
-RULES:
-- MAX 3 points per card
-- Each point MUST be short (1 line)
-- NO long explanations
-- Titles must be short
-- NO extra commentary
-
+    prompt = f"""Create {num_cards} concise study flashcards...
 Text:
 {safe_text}
 """
@@ -64,7 +34,6 @@ Text:
         do_sample=False
     )[0]['generated_text']
 
-    # ✅ Safety fallback
     if "Card 1:" not in output:
         return """Card 1:
 Title: Key Concept
@@ -74,18 +43,15 @@ Point 3: Practical implication"""
 
     return output
 
-# -----------------------------
-# Quiz / Questions
-# -----------------------------
+
 def generate_quiz(text, num_questions=5):
 
     sentences = sent_tokenize(text)
 
-    # Filter usable sentences
-    candidates = [
-        s for s in sentences
-        if 40 < len(s) < 160
-    ]
+    if not sentences:
+        return "No content available."
+
+    candidates = [s for s in sentences if 40 < len(s) < 160]
 
     if len(candidates) < num_questions:
         candidates = sentences[:num_questions]
@@ -100,7 +66,11 @@ def generate_quiz(text, num_questions=5):
 
         correct = sentence
 
-        distractors = random.sample(sentences, min(3, len(sentences)))
+        distractors = random.sample(
+            sentences,
+            k=min(3, max(1, len(sentences)-1))
+        )
+
         options = [correct] + distractors
         random.shuffle(options)
 
