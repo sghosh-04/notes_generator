@@ -1,5 +1,4 @@
 import streamlit as st
-from transformers import pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import nltk
@@ -26,13 +25,12 @@ def get_generator():
 
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_name,
-        device_map="cpu",          # ✅ FORCE CPU
         torch_dtype="auto",        # ✅ Prevent dtype mismatch
         low_cpu_mem_usage=True     # ✅ CRITICAL for Cloud
     )
 
     return pipeline(
-        task="image-text-to-text",
+        task="text2text-generation",   # ✅ FIXED (Correct task)
         model=model,
         tokenizer=tokenizer
     )
