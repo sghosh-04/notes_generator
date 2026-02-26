@@ -8,5 +8,6 @@ python-docx
 reportlab
 numpy
 torch 
+accelerate
 jiwer
 python-dotenv
