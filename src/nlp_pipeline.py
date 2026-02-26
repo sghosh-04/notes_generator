@@ -23,10 +23,16 @@ def get_generator():
     model_name = "google/flan-t5-small"
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+
+    model = AutoModelForSeq2SeqLM.from_pretrained(
+        model_name,
+        device_map="cpu",          # ✅ FORCE CPU
+        torch_dtype="auto",        # ✅ Prevent dtype mismatch
+        low_cpu_mem_usage=True     # ✅ CRITICAL for Cloud
+    )
 
     return pipeline(
-        task="image-text-to-text",   # ✅ REQUIRED FIX
+        task="image-text-to-text",
         model=model,
         tokenizer=tokenizer
     )
