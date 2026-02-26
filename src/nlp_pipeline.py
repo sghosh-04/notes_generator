@@ -18,13 +18,21 @@ load_nltk()
 # -----------------------------
 @st.cache_resource
 def get_generator():
+    from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
+
+    model_name = "google/flan-t5-small"
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+
     return pipeline(
-        "any-to-any",                 # ✅ REQUIRED FIX (Cloud-safe)
-        model="google/flan-t5-small"
+        task="text2text-generation",   # ✅ REQUIRED FIX
+        model=model,
+        tokenizer=tokenizer
     )
 
 
-def chunk_text(text, chunk_size=250):  # ✅ REQUIRED FIX (safer size)
+def chunk_text(text, chunk_size=250):
     """
     Splits text into word-based chunks.
     Prevents transformer token overflow.
@@ -65,7 +73,7 @@ def summarize_text(text, max_len=80):
 # -----------------------------
 def extract_keywords(text, top_n=10):
 
-    if not text.strip():              # ✅ REQUIRED FIX (prevents crash)
+    if not text.strip():
         return []
 
     vectorizer = TfidfVectorizer(stop_words="english")
@@ -84,12 +92,12 @@ def extract_keywords(text, top_n=10):
 # -----------------------------
 def detect_topics(text, top_n=5):
 
-    if not text.strip():              # ✅ REQUIRED FIX (prevents crash)
+    if not text.strip():
         return [], []
 
     sentences = sent_tokenize(text)
 
-    if len(sentences) < 2:            # ✅ REQUIRED FIX (sklearn safety)
+    if len(sentences) < 2:
         return [], sentences
 
     vectorizer = TfidfVectorizer(stop_words="english")
