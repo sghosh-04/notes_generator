@@ -5,6 +5,7 @@ import streamlit as st
 from transformers import pipeline
 
 
+
 @st.cache_resource
 def get_generator():
     return pipeline(
@@ -23,7 +24,17 @@ def generate_flashcards(text, num_cards=5):
     MAX_INPUT_CHARS = 1500
     safe_text = text[:MAX_INPUT_CHARS]
 
-    prompt = f"""Create {num_cards} concise study flashcards...
+    prompt = f"""
+Create {num_cards} concise study flashcards.
+
+STRICT FORMAT:
+
+Card 1:
+Title: <short topic>
+Point 1: <key idea>
+Point 2: <supporting detail>
+Point 3: <exam-relevant takeaway>
+
 Text:
 {safe_text}
 """
@@ -43,8 +54,9 @@ Point 3: Practical implication"""
 
     return output
 
-
 def generate_quiz(text, num_questions=5):
+
+    nltk.download('punkt', quiet=True)
 
     sentences = sent_tokenize(text)
 
@@ -66,12 +78,18 @@ def generate_quiz(text, num_questions=5):
 
         correct = sentence
 
-        distractors = random.sample(
-            sentences,
-            k=min(3, max(1, len(sentences) - 1))
-        )
+        other_sentences = [s for s in sentences if s != correct and len(s) > 30]
+
+        if len(other_sentences) >= 3:
+            distractors = random.sample(other_sentences, k=3)
+        else:
+            distractors = other_sentences
 
         options = [correct] + distractors
+
+        while len(options) < 4:
+            options.append("None of the above")
+
         random.shuffle(options)
 
         letters = ["A", "B", "C", "D"]
