@@ -1,8 +1,11 @@
-from click import style
 import streamlit as st
+import tempfile
+import os
+import time
+import re   # ✅ FIXED
 
 # -----------------------------
-# Page Config (✅ MUST BE FIRST)
+# Page Config (FIRST)
 # -----------------------------
 st.set_page_config(
     page_title="AI Voice Intelligence System",
@@ -10,12 +13,18 @@ st.set_page_config(
     layout="wide"
 )
 
+# ✅ Optional: Slightly bigger tabs
+st.markdown("""
+<style>
+button[data-baseweb="tab"] p {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
-import tempfile
-import os
-import time
-
-st.write("Audio to Notes Generator")
+st.title("🎙 AI Voice Intelligence & Knowledge Extraction System")
+st.markdown("Convert speech into structured knowledge, summaries, quizzes and flashcards.")
 
 from src.asr import transcribe_audio
 from src.nlp_pipeline import summarize_text, extract_keywords, detect_topics
@@ -23,17 +32,11 @@ from src.notes_engine import build_topic_map, generate_structured_notes, smart_n
 from src.study_tools import generate_flashcards, generate_quiz
 from src.export_utils import export_to_pdf, export_to_docx
 
-
-st.title("🎙 AI Voice Intelligence & Knowledge Extraction System")
-st.markdown("Convert speech into structured knowledge, summaries, quizzes and flashcards.")
-
-
 # -----------------------------
-# Session State Initialization
+# Session State
 # -----------------------------
 if "results" not in st.session_state:
     st.session_state.results = None
-
 
 # -----------------------------
 # Sidebar
@@ -57,35 +60,33 @@ model_map = {
 
 model_size = model_map[model_choice]
 
-generate_btn = st.sidebar.button("Generate Insights")
-
+generate_btn = st.sidebar.button("🚀 Generate Insights")
 
 # -----------------------------
 # Audio Handling
 # -----------------------------
-audio_path = None  # ✅ REQUIRED FIX
+audio_path = None
 
 if uploaded_file:
-    st.subheader("Uploaded Audio")
+    st.subheader("🎧 Uploaded Audio")
     st.audio(uploaded_file)
 
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
         tmp_file.write(uploaded_file.read())
         audio_path = tmp_file.name
 
-
 # -----------------------------
 # Processing
 # -----------------------------
 if uploaded_file and generate_btn and audio_path:
 
-    with st.spinner("Go through the audio while we transcribe..."):
+    with st.spinner("🧠 Transcribing audio..."):
         segments, info, full_text, inference_time = transcribe_audio(
             audio_path,
             model_size=model_size
         )
 
-    with st.spinner("Almost there generating AI insights..."):
+    with st.spinner("✨ Generating AI insights..."):
         summary = summarize_text(full_text)
         keywords = extract_keywords(full_text)
         topics, sentences = detect_topics(full_text)
@@ -112,7 +113,6 @@ if uploaded_file and generate_btn and audio_path:
     }
 
     st.rerun()
-
 
 # -----------------------------
 # Display Results
@@ -141,13 +141,19 @@ QUIZ
 """
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("Detected Language", r["info"].language)
-    col2.metric("Inference Time (sec)", r["inference_time"])
-    col3.metric("Transcript Length", len(r["full_text"]))
+    col1.metric("🌐 Detected Language", r["info"].language)
+    col2.metric("⏱ Inference Time (sec)", round(r["inference_time"], 2))
+    col3.metric("📝 Transcript Length", len(r["full_text"]))
 
     tabs = st.tabs([
-        "Transcript", "Structured Notes", "Smart Notes",
-        "Summary", "Keywords", "Flashcards", "Quiz", "Export"
+        "📝 Transcript",
+        "📌 Structured Notes",
+        "🧠 Smart Notes",
+        "📊 Summary",
+        "🔑 Keywords",
+        "📚 Flashcards",
+        "❓ Quiz",
+        "📥 Export"
     ])
 
     with tabs[0]:
@@ -169,37 +175,33 @@ QUIZ
 
     with tabs[5]:
         st.markdown("### 📚 Study Flashcards")
-    
+
         raw_cards = r["flashcards"]
-    
-        # Split cards safely
         card_blocks = re.split(r"\n(?=Card\s\d+:)", raw_cards)
-    
+
         colors = ["#1E88E5", "#43A047", "#E53935", "#8E24AA", "#FB8C00"]
         cols = st.columns(3)
-    
+
         for i, block in enumerate(card_blocks):
-    
+
             if not block.strip():
                 continue
-    
+
             lines = [l.strip() for l in block.split("\n") if l.strip()]
-    
+
             title = None
             points = []
-    
+
             for line in lines:
-    
                 if line.startswith("Title:"):
                     title = line.replace("Title:", "").strip()
-    
+
                 elif line.startswith("Point"):
                     points.append(line.split(":", 1)[1].strip())
-    
+
             if title:
-    
                 color = colors[i % len(colors)]
-    
+
                 with cols[i % 3]:
                     st.markdown(
                         f"""
@@ -209,20 +211,16 @@ QUIZ
                             border-radius:16px;
                             margin-bottom:15px;
                             color:white;
-                            min-height:160px;
-                            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
                         ">
                             <h4>📌 {title}</h4>
-                            <p style="font-size:14px; line-height:1.5;">
-                                {"<br>".join(points[:3])}
-                            </p>
+                            <p>{"<br>".join(points[:3])}</p>
                         </div>
                         """,
                         unsafe_allow_html=True
                     )
 
     with tabs[6]:
-        st.markdown(f"```\n{r['quiz']}\n```")
+        st.text(r["quiz"])
 
     with tabs[7]:
         os.makedirs("outputs", exist_ok=True)
@@ -239,11 +237,10 @@ QUIZ
         with open(docx_path, "rb") as f:
             st.download_button("⬇ Download DOCX", f.read(), "AI_Report.docx")
 
-
 # -----------------------------
 # Cleanup Temp File
 # -----------------------------
-if audio_path and os.path.exists(audio_path):  # ✅ REQUIRED FIX
+if audio_path and os.path.exists(audio_path):
     try:
         os.unlink(audio_path)
     except:
