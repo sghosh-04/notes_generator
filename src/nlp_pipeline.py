@@ -26,7 +26,7 @@ def get_generator():
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
     return pipeline(
-        task="text2text-generation",   # ✅ REQUIRED FIX
+        task="image-text-to-text",   # ✅ REQUIRED FIX
         model=model,
         tokenizer=tokenizer
     )
