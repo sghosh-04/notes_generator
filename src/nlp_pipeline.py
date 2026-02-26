@@ -41,21 +41,23 @@ def chunk_text(text, chunk_size=400):
     return chunks
 
 
-def summarize_text(text, max_len=80, min_len=25):
-    summarizer = get_generator()
+def summarize_text(text, max_len=80):
 
-    chunks = chunk_text(text)
+    if not text or len(text.split()) < 30:
+        return "Text too short to summarize."
+
+    summarizer = get_summarizer()
+
+    chunks = chunk_text(text, chunk_size=250)
     summaries = []
 
     for chunk in chunks:
-        summary = summarizer(
-            chunk,
+        result = summarizer(
             f"summarize: {chunk}",
             max_length=max_len,
-            min_length=min_len,
             do_sample=False
         )
-        summaries.append(summary[0]['generated_text'])
+        summaries.append(result[0]["generated_text"])
 
     return " ".join(summaries)
 
