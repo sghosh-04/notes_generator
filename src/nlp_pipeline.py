@@ -30,7 +30,7 @@ def get_generator():
     )
 
     return pipeline(
-        task="text2text-generation",   # ✅ FIXED (Correct task)
+        "text2text-generation",   # ✅ FIXED (Correct task)
         model=model,
         tokenizer=tokenizer
     )
