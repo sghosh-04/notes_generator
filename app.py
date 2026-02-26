@@ -6,13 +6,15 @@ st.write("✅ Imports successful")
 import os
 import time
 
+st.write("✅ Session state initialized")
+
 from src.asr import transcribe_audio
 from src.nlp_pipeline import summarize_text, extract_keywords, detect_topics
 from src.notes_engine import build_topic_map, generate_structured_notes, smart_notes
 from src.study_tools import generate_flashcards, generate_quiz
 from src.export_utils import export_to_pdf, export_to_docx
 
-
+st.write("✅ Before transcription block")
 
 # -----------------------------
 # Page Config
