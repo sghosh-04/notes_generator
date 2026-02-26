@@ -10,9 +10,12 @@ st.set_page_config(
     layout="wide"
 )
 
+
 import tempfile
 import os
 import time
+
+st.write("Audio to Notes Generator")
 
 from src.asr import transcribe_audio
 from src.nlp_pipeline import summarize_text, extract_keywords, detect_topics
@@ -21,7 +24,7 @@ from src.study_tools import generate_flashcards, generate_quiz
 from src.export_utils import export_to_pdf, export_to_docx
 
 
-st.title("🎙 AI Voice Intelligence & Knowledge Extraction System: Audio to Notes Generator")
+st.title("🎙 AI Voice Intelligence & Knowledge Extraction System")
 st.markdown("Convert speech into structured knowledge, summaries, quizzes and flashcards.")
 
 
@@ -165,7 +168,58 @@ QUIZ
             st.write(f"**{word}** — {round(score, 3)}")
 
     with tabs[5]:
-        st.text(r["flashcards"])
+        st.markdown("### 📚 Study Flashcards")
+    
+        raw_cards = r["flashcards"]
+    
+        # Split cards safely
+        card_blocks = re.split(r"\n(?=Card\s\d+:)", raw_cards)
+    
+        colors = ["#1E88E5", "#43A047", "#E53935", "#8E24AA", "#FB8C00"]
+        cols = st.columns(3)
+    
+        for i, block in enumerate(card_blocks):
+    
+            if not block.strip():
+                continue
+    
+            lines = [l.strip() for l in block.split("\n") if l.strip()]
+    
+            title = None
+            points = []
+    
+            for line in lines:
+    
+                if line.startswith("Title:"):
+                    title = line.replace("Title:", "").strip()
+    
+                elif line.startswith("Point"):
+                    points.append(line.split(":", 1)[1].strip())
+    
+            if title:
+    
+                color = colors[i % len(colors)]
+    
+                with cols[i % 3]:
+                    st.markdown(
+                        f"""
+                        <div style="
+                            background-color:{color};
+                            padding:18px;
+                            border-radius:16px;
+                            margin-bottom:15px;
+                            color:white;
+                            min-height:160px;
+                            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                        ">
+                            <h4>📌 {title}</h4>
+                            <p style="font-size:14px; line-height:1.5;">
+                                {"<br>".join(points[:3])}
+                            </p>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
     with tabs[6]:
         st.markdown(f"```\n{r['quiz']}\n```")
