@@ -1,11 +1,14 @@
 import streamlit as st
+import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import nltk
 from nltk.tokenize import sent_tokenize
 
 
-@st.cache_resource
+# -----------------------------
+# NLTK Loader (Cloud Safe)
+# -----------------------------
 @st.cache_resource
 def load_nltk():
     nltk_data_path = "/home/appuser/nltk_data"
@@ -32,22 +35,18 @@ def get_generator():
 
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_name,
-        torch_dtype="auto",        # ✅ Prevent dtype mismatch
-        low_cpu_mem_usage=True     # ✅ CRITICAL for Cloud
+        torch_dtype="auto",
+        low_cpu_mem_usage=True
     )
 
     return pipeline(
-        "text2text-generation",   # ✅ FIXED (Correct task)
+        "text2text-generation",
         model=model,
         tokenizer=tokenizer
     )
 
 
 def chunk_text(text, chunk_size=250):
-    """
-    Splits text into word-based chunks.
-    Prevents transformer token overflow.
-    """
     words = text.split()
     chunks = []
 
