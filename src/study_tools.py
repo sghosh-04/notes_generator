@@ -11,8 +11,8 @@ from transformers import pipeline
 # Load Local Text Generation Model
 # -----------------------------
 generator = pipeline(
-    "text2text-generation",
-    model="google/flan-t5-base"
+    "text-generation",
+    model="google/flan-t5-small"
 )
 
 # -----------------------------
