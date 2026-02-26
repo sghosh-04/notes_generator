@@ -87,3 +87,22 @@ Designed as an **AIML internship-level project**, this system showcases real-wor
 ---
 
 ## 📂 Project Structure
+notes-generator/
+│
+├── .devcontainer/ # Development container configuration
+├── assets/ # Architecture images & static assets
+├── outputs/ # Generated notes, PDFs, study materials
+│
+├── src/ # Core application logic
+│ ├── init.py
+│ ├── asr.py # Speech-to-text module (Faster-Whisper)
+│ ├── nlp_pipeline.py # NLP processing (cleaning, embeddings, clustering)
+│ ├── notes_engine.py # Structured notes generation engine
+│ ├── study_tools.py # Flashcards & quiz generation
+│ └── export_utils.py # PDF / DOCX export utilities
+│
+├── app.py # Streamlit frontend entry point
+├── requirements.txt # Python dependencies
+├── runtime.txt # Runtime configuration (deployment)
+├── .gitignore
+└── README.md
