@@ -22,7 +22,7 @@ load_nltk()
 @st.cache_resource
 def get_generator():
     return pipeline(
-        "text-generation",
+        "text2text-generation",
         model="google/flan-t5-small"   # 🔥 MUCH safer
     )
 
@@ -46,7 +46,7 @@ def summarize_text(text, max_len=80):
     if not text or len(text.split()) < 30:
         return "Text too short to summarize."
 
-    summarizer = get_summarizer()
+    summarizer = get_generator()
 
     chunks = chunk_text(text, chunk_size=250)
     summaries = []
@@ -60,7 +60,6 @@ def summarize_text(text, max_len=80):
         summaries.append(result[0]["generated_text"])
 
     return " ".join(summaries)
-
 # -----------------------------
 # Keyword Extraction
 # -----------------------------
