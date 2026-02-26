@@ -1,6 +1,6 @@
 streamlit
 faster-whisper
-transformers==4.36.2 --only-binary=:all:
+transformers
 sentencepiece
 scikit-learn
 nltk
