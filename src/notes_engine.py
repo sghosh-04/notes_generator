@@ -1,14 +1,10 @@
 def generate_structured_notes(topic_map, max_sentences=5):
     """
     Generates structured notes grouped by topics.
-
-    Args:
-        topic_map (dict): {topic: [sentences]}
-        max_sentences (int): limit sentences per topic
-
-    Returns:
-        str: formatted notes
     """
+
+    if not topic_map:   # ✅ REQUIRED FIX (safety)
+        return "No topics available."
 
     notes = []
 
@@ -27,14 +23,10 @@ def generate_structured_notes(topic_map, max_sentences=5):
 def build_topic_map(sentences, topics):
     """
     Maps sentences to detected topics.
-
-    Args:
-        sentences (list)
-        topics (list)
-
-    Returns:
-        dict: {topic: [related sentences]}
     """
+
+    if not sentences or not topics:   # ✅ REQUIRED FIX
+        return {}
 
     topic_map = {topic: [] for topic in topics}
 
@@ -49,14 +41,10 @@ def build_topic_map(sentences, topics):
 def smart_notes(sentences, topics):
     """
     Generates insight-style smart notes.
-
-    Args:
-        sentences (list)
-        topics (list)
-
-    Returns:
-        str: formatted smart notes
     """
+
+    if not sentences or not topics:   # ✅ REQUIRED FIX
+        return "No smart notes available."
 
     notes = []
 
