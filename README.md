@@ -23,7 +23,7 @@ This project demonstrates practical implementation of:
 - 📝 Structured note generation
 - 📤 Export to PDF / DOCX
 
-Designed as an **AIML internship-level project**, this system showcases real-world ML pipeline engineering, debugging, and deployment thinking.
+Designed as an **AIML project**, this system showcases real-world ML pipeline engineering, debugging, and deployment thinking.
 
 ---
 
